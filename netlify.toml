@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/api/apps/*"
+  to = "https://al-ahsan-foundation-bangladesh-b0808e7b.base44.app/api/apps/:splat"
+  status = 200
+  force = true
