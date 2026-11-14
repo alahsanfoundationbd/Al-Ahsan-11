@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm install --no-save @netlify/vite-plugin-tanstack-start && npx vite build --config vite.config.netlify.js"
   publish = "dist/client"
 
 [build.environment]
