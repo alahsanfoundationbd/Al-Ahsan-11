@@ -1,0 +1,142 @@
+{
+  "name": "Donation",
+  "type": "object",
+  "properties": {
+    "donor_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "bkash",
+        "nagad",
+        "rocket",
+        "bank",
+        "cash"
+      ],
+      "enumColors": [
+        "pink",
+        "yellow",
+        "purple",
+        "blue",
+        "gray"
+      ],
+      "default": "bkash"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "activity_id": {
+      "type": "string"
+    },
+    "activity_title": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "project_title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "is_monthly": {
+      "type": "boolean",
+      "default": false
+    },
+    "recurring_frequency": {
+      "type": "string",
+      "enum": [
+        "one_time",
+        "daily",
+        "weekly",
+        "biweekly",
+        "monthly",
+        "custom"
+      ],
+      "enumColors": [
+        "gray",
+        "blue",
+        "purple",
+        "pink",
+        "green",
+        "yellow"
+      ],
+      "default": "one_time"
+    },
+    "recurring_interval_days": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "verified",
+        "rejected"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "red"
+      ],
+      "default": "pending"
+    },
+    "receipt_no": {
+      "type": "string"
+    },
+    "lookup_code": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "verified_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "donor_name",
+    "amount",
+    "receipt_no"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

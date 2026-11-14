@@ -1,0 +1,114 @@
+{
+  "name": "RecurringDonation",
+  "type": "object",
+  "properties": {
+    "donor_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly",
+        "biweekly",
+        "monthly",
+        "custom"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "pink",
+        "green",
+        "yellow"
+      ],
+      "default": "monthly"
+    },
+    "interval_days": {
+      "type": "number",
+      "default": 30
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "project_title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "cancelled"
+      ],
+      "enumColors": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "active"
+    },
+    "start_date": {
+      "type": "string"
+    },
+    "next_charge_date": {
+      "type": "string"
+    },
+    "last_charged_at": {
+      "type": "string"
+    },
+    "receipt_no": {
+      "type": "string"
+    },
+    "gateway_ref": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "donor_name",
+    "amount"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

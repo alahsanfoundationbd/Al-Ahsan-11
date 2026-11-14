@@ -1,0 +1,76 @@
+{
+  "name": "LedgerEntry",
+  "type": "object",
+  "properties": {
+    "entry_type": {
+      "type": "string",
+      "enum": [
+        "income",
+        "expense"
+      ],
+      "enumColors": [
+        "green",
+        "red"
+      ],
+      "default": "expense"
+    },
+    "category": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "entry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "receipt_no": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "attachment_url": {
+      "type": "string"
+    },
+    "activity_id": {
+      "type": "string"
+    },
+    "recorded_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "entry_type",
+    "title",
+    "amount",
+    "receipt_no"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

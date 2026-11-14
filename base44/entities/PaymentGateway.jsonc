@@ -1,0 +1,48 @@
+{
+  "name": "PaymentGateway",
+  "type": "object",
+  "properties": {
+    "provider_name": {
+      "type": "string"
+    },
+    "base_url": {
+      "type": "string"
+    },
+    "api_key": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "instructions": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider_name",
+    "base_url"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
