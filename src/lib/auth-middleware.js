@@ -1,20 +1,24 @@
-import { createClientFromRequest, getAccessToken } from "@base44/sdk";
+import { createClient, createClientFromRequest, getAccessToken } from "@base44/sdk";
 import { createMiddleware } from "@tanstack/react-start";
 import { getRequest, setResponseStatus } from "@tanstack/react-start/server";
 
-// Both middlewares hand handlers the same lazy `context.getBase44()`: a
-// function, not the client, because the client needs the platform headers and
-// a handler that never touches Base44 must still answer without them. The
-// platform sets those headers on every request that reaches the server; a
-// visitor's Authorization header makes the client act as that visitor.
-const withGetBase44 = (next, request = getRequest()) => {
-  let client;
-  return next({ context: { getBase44: () => (client ??= createClientFromRequest(request)) } });
+// Base44 হোস্টিংয়ে প্ল্যাটফর্ম হেডার থাকে; Netlify-তে না থাকলে নিজে ক্লায়েন্ট বানানো হয়
+const makeClient = (request) => {
+  if (request?.headers?.get("Base44-App-Id")) return createClientFromRequest(request);
+  const auth = request?.headers?.get("Authorization") || "";
+  const token = auth.replace(/^Bearer\s+/i, "") || undefined;
+  return createClient({
+    appId: import.meta.env.VITE_BASE44_APP_ID,
+    token,
+    serverUrl: import.meta.env.VITE_BASE44_APP_BASE_URL,
+  });
 };
 
-// Applied to every server function by src/start.js: sends the visitor's Base44
-// access token with the call so `context.getBase44()` acts as the visitor (entity
-// access rules apply). Anonymous visitors send nothing and get an anonymous client.
+const withGetBase44 = (next, request = getRequest()) => {
+  let client;
+  return next({ context: { getBase44: () => (client ??= makeClient(request)) } });
+};
+
 export const authMiddleware = createMiddleware({ type: "function" })
   .client(async ({ next }) => {
     const token = typeof window === "undefined" ? null : getAccessToken();
@@ -22,13 +26,10 @@ export const authMiddleware = createMiddleware({ type: "function" })
   })
   .server(({ next }) => withGetBase44(next));
 
-// Applied to every request by src/start.js, so a server route handler
-// (`server.handlers`) receives the same `context.getBase44()` as a server function.
 export const base44RequestMiddleware = createMiddleware({ type: "request" }).server(({ next, request }) =>
   withGetBase44(next, request),
 );
 
-// Only an auth rejection means "not signed in"; outages and rate limits propagate as themselves.
 const currentUser = (context) =>
   context
     .getBase44()
@@ -38,9 +39,6 @@ const currentUser = (context) =>
       throw error;
     });
 
-// Neither middleware authenticates anyone. Add this to a server function that
-// needs a signed-in caller; it rejects anonymous callers and sets `context.user`:
-//   createServerFn().middleware([requireUser]).handler(({ context }) => context.user.id)
 export const requireUser = createMiddleware({ type: "function" }).server(async ({ next, context }) => {
   const user = await currentUser(context);
   if (!user) {
@@ -50,9 +48,6 @@ export const requireUser = createMiddleware({ type: "function" }).server(async (
   return next({ context: { user } });
 });
 
-// The same for a server route: `server: { middleware: [requireUserRoute], handlers }` answers
-// anonymous callers with 401 and sets `context.user`. Only on src/routes/api/* files: a route's
-// middleware also runs for every route under it, and page navigations carry no token.
 export const requireUserRoute = createMiddleware({ type: "request" }).server(async ({ next, context }) => {
   const user = await currentUser(context);
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
